@@ -8,7 +8,8 @@
     "scheme": "facepal",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.facepal.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,11 +18,13 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.facepal.app",
+      "permissions": ["android.permission.CAMERA", "android.permission.POST_NOTIFICATIONS"]
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -31,9 +34,24 @@
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#FFF8F3"
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "FacePal uses the camera for your daily selfie.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#5C3D4E"
+        }
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

@@ -1,56 +1,36 @@
-import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import type { ReactNode } from 'react'
 
-import { useColorScheme } from '@/components/useColorScheme';
+import { AuthGate } from '@/src/components/auth-gate'
+import { AuthProvider } from '@/src/lib/auth'
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+export { ErrorBoundary } from 'expo-router'
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+/**
+ * Root stack: auth, consent, tabs, and detail screens.
+ */
+const RootLayout = (): ReactNode => (
+  <AuthProvider>
+    <AuthGate>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: '#FFF8F3' },
+          headerTintColor: '#241820',
+          contentStyle: { backgroundColor: '#FFF8F3' },
+        }}
+      >
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="consent" options={{ title: 'Your photos' }} />
+        <Stack.Screen name="review" options={{ title: 'Today’s check' }} />
+        <Stack.Screen name="history" options={{ title: 'History' }} />
+        <Stack.Screen name="compare" options={{ title: 'Compare' }} />
+        <Stack.Screen name="yoga/[slug]" options={{ title: 'Face yoga' }} />
       </Stack>
-    </ThemeProvider>
-  );
-}
+    </AuthGate>
+  </AuthProvider>
+)
+
+export default RootLayout
