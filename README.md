@@ -17,7 +17,13 @@ npm install
 npx expo start
 ```
 
-Use Expo Go on a phone for the camera, or press `w` for web. In the Supabase dashboard, turn off email confirmation if you want sign-up to enter the app immediately (Authentication → Providers → Email).
+Use Expo Go on a phone for the camera, or press `w` for web. The same project exports a browser app for testing:
+
+```bash
+npm run build
+```
+
+Vercel should use that build and publish the `dist` folder. Client routes fall back to `index.html`. The publishable Supabase key is in `.env.production` so the hosted build can sign in. The database password stays out of the repo. In the Supabase dashboard, turn off email confirmation if you want sign-up to enter the app immediately (Authentication → Providers → Email).
 
 ## What is included
 

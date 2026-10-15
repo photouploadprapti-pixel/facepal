@@ -1,17 +1,22 @@
 /**
- * Reads a required public Expo env value.
- * @param name Env var name, including the EXPO_PUBLIC_ prefix.
+ * Reads the public Supabase project URL. The name must be written out so Expo
+ * can inline it into the web bundle.
  */
-const readEnv = (name: string): string => {
-  const value = process.env[name]
+export const supabaseUrl = (): string => {
+  const value = process.env.EXPO_PUBLIC_SUPABASE_URL
   if (!value) {
-    throw new Error(`Missing ${name}. Copy .env.example to .env and fill it in.`)
+    throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL. Copy .env.example to .env.')
   }
   return value
 }
 
-/** Supabase project URL from the public env. */
-export const supabaseUrl = (): string => readEnv('EXPO_PUBLIC_SUPABASE_URL')
-
-/** Publishable client key. Never put the database password here. */
-export const supabaseKey = (): string => readEnv('EXPO_PUBLIC_SUPABASE_KEY')
+/**
+ * Reads the publishable client key. Never put the database password here.
+ */
+export const supabaseKey = (): string => {
+  const value = process.env.EXPO_PUBLIC_SUPABASE_KEY
+  if (!value) {
+    throw new Error('Missing EXPO_PUBLIC_SUPABASE_KEY. Copy .env.example to .env.')
+  }
+  return value
+}
