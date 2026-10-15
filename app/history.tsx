@@ -5,6 +5,7 @@ import { Text, View } from 'react-native'
 import { AnalysisCard } from '@/src/components/analysis-card'
 import { Screen } from '@/src/components/screen'
 import { fetchCheckins } from '@/src/lib/data'
+import { checkinToAnalysis } from '@/src/lib/skin-read'
 import { ui } from '@/src/theme/ui'
 import type { Checkin } from '@/src/types/models'
 
@@ -38,16 +39,7 @@ const HistoryScreen = () => {
       {rows.map((row) => (
         <View key={row.id} style={{ gap: 8 }}>
           <Text style={ui.muted}>{new Date(row.capturedAt).toLocaleString()}</Text>
-          <AnalysisCard
-            analysis={{
-              redness: row.redness,
-              underEye: row.underEye,
-              texture: row.texture,
-              unevenTone: row.unevenTone,
-              findings: row.findings,
-              summary: row.summary,
-            }}
-          />
+          <AnalysisCard analysis={checkinToAnalysis(row)} />
         </View>
       ))}
     </Screen>

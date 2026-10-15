@@ -95,6 +95,8 @@ export const parseCheckin = (value: unknown): Checkin | null => {
   const underEye = readNumber(row, 'under_eye')
   const texture = readNumber(row, 'texture')
   const unevenTone = readNumber(row, 'uneven_tone')
+  const blemishes = readNumber(row, 'blemishes') ?? 0
+  const quality = readNumber(row, 'quality') ?? 0
   const rawFindings = row.findings
   if (
     !id ||
@@ -123,6 +125,8 @@ export const parseCheckin = (value: unknown): Checkin | null => {
     underEye,
     texture,
     unevenTone,
+    blemishes,
+    quality,
     findings,
     summary,
   }

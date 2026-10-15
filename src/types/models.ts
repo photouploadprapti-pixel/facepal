@@ -1,5 +1,10 @@
 /** Stable codes for photo signals the check can raise. */
-export type FindingCode = 'redness' | 'under_eye' | 'texture' | 'uneven_tone'
+export type FindingCode =
+  | 'redness'
+  | 'under_eye'
+  | 'texture'
+  | 'uneven_tone'
+  | 'blemish'
 
 /** Pose the face-yoga animation should play. */
 export type AnimationKey =
@@ -30,6 +35,8 @@ export type Checkin = {
   underEye: number
   texture: number
   unevenTone: number
+  blemishes: number
+  quality: number
   findings: FindingCode[]
   summary: string
 }
@@ -71,6 +78,9 @@ export type AnalysisResult = {
   underEye: number
   texture: number
   unevenTone: number
+  blemishes: number
+  quality: number
   findings: FindingCode[]
   summary: string
+  tips: string[]
 }

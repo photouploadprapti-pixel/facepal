@@ -6,19 +6,22 @@ import { AnalysisCard } from '@/src/components/analysis-card'
 import { Screen } from '@/src/components/screen'
 import { analyzeJpeg } from '@/src/lib/analyze-face'
 import { useAuth } from '@/src/lib/auth'
-import { decodeBase64, saveCheckin } from '@/src/lib/data'
+import { decodeBase64, fetchCheckins, saveCheckin } from '@/src/lib/data'
 import { peekPendingScan, takePendingScan } from '@/src/lib/pending-scan'
+import { compareReads } from '@/src/lib/skin-read'
+import { streakFromDates } from '@/src/lib/streak'
 import { ui } from '@/src/theme/ui'
-import type { AnalysisResult } from '@/src/types/models'
+import type { AnalysisResult, Checkin } from '@/src/types/models'
 
 /**
- * Runs the on-device check and lets the user save or discard the selfie.
+ * Shows the skin read for the new selfie, then saves it.
  */
 const ReviewScreen = () => {
   const router = useRouter()
   const { user } = useAuth()
   const [base64, setBase64] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
+  const [previous, setPrevious] = useState<Checkin[]>([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -34,6 +37,9 @@ const ReviewScreen = () => {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not read the photo')
     }
+    fetchCheckins()
+      .then((rows) => setPrevious(rows))
+      .catch(() => setPrevious([]))
   }, [])
 
   const save = async (): Promise<void> => {
@@ -51,13 +57,21 @@ const ReviewScreen = () => {
     }
   }
 
+  const last = previous[0]
+  const streak = streakFromDates([
+    ...previous.map((row) => row.capturedAt),
+    new Date().toISOString(),
+  ])
+  const compareLines = analysis && last ? compareReads(analysis, last, streak) : []
+
   return (
     <Screen>
-      {analysis ? <AnalysisCard analysis={analysis} /> : null}
+      <Text style={ui.title}>Today’s read</Text>
+      {analysis ? <AnalysisCard analysis={analysis} compareLines={compareLines} /> : null}
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {analysis ? (
         <Pressable style={ui.button} disabled={busy} onPress={() => void save()}>
-          <Text style={ui.buttonText}>{busy ? 'Saving…' : 'Save check-in'}</Text>
+          <Text style={ui.buttonText}>{busy ? 'Saving…' : 'Save this read'}</Text>
         </Pressable>
       ) : null}
       <Pressable

@@ -2,6 +2,9 @@ import { parseCheckin, parseRoutine, parseTip } from '@/src/lib/guards'
 import { supabase } from '@/src/lib/supabase'
 import type { AnalysisResult, Checkin, Tip, YogaRoutine } from '@/src/types/models'
 
+const checkinColumns =
+  'id, user_id, captured_at, storage_path, redness, under_eye, texture, uneven_tone, blemishes, quality, findings, summary'
+
 const routineSelect =
   'id, slug, title, zone, minutes, summary, level, video_url, yoga_steps(id, step_order, title, instruction, seconds, animation_key)'
 
@@ -25,9 +28,7 @@ export const decodeBase64 = (value: string): Uint8Array => {
 export const fetchCheckins = async (): Promise<Checkin[]> => {
   const { data, error } = await supabase
     .from('checkins')
-    .select(
-      'id, user_id, captured_at, storage_path, redness, under_eye, texture, uneven_tone, findings, summary',
-    )
+    .select(checkinColumns)
     .order('captured_at', { ascending: false })
   if (error) throw new Error(error.message)
   return (data ?? [])
@@ -74,12 +75,12 @@ export const saveCheckin = async (
       under_eye: analysis.underEye,
       texture: analysis.texture,
       uneven_tone: analysis.unevenTone,
+      blemishes: analysis.blemishes,
+      quality: analysis.quality,
       findings: analysis.findings,
       summary: analysis.summary,
     })
-    .select(
-      'id, user_id, captured_at, storage_path, redness, under_eye, texture, uneven_tone, findings, summary',
-    )
+    .select(checkinColumns)
     .single()
   if (error) throw new Error(error.message)
   const checkin = parseCheckin(data)

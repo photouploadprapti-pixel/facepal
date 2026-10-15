@@ -50,8 +50,10 @@ const SignInScreen = () => {
       <Pressable style={ui.button} disabled={busy} onPress={() => void submit()}>
         <Text style={ui.buttonText}>{busy ? 'Signing in…' : 'Sign in'}</Text>
       </Pressable>
-      <Link href="/sign-up" style={ui.muted}>
-        Create an account
+      <Link href="/sign-up" asChild>
+        <Pressable style={ui.ghost}>
+          <Text style={ui.ghostText}>Create an account</Text>
+        </Pressable>
       </Link>
     </Screen>
   )

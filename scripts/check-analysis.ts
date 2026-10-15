@@ -70,8 +70,21 @@ if (!tired.findings.includes('under_eye')) {
   throw new Error(`Expected under_eye, got ${tired.findings.join(',') || 'none'} (${tired.underEye})`)
 }
 
+const spotted = scorePixels(
+  width,
+  height,
+  paint(width, height, (x, y) => {
+    const spot = x > 128 && x < 142 && y > 136 && y < 152
+    return spot ? [230, 60, 60] : skin
+  }),
+)
+if (spotted.blemishes < 40) {
+  throw new Error(`Expected spot signal, got ${spotted.blemishes}`)
+}
+
 console.log('analysis checks passed', {
-  calm: calm.redness,
+  calm: calm.quality,
   flushed: flushed.redness,
   tired: tired.underEye,
+  spots: spotted.blemishes,
 })

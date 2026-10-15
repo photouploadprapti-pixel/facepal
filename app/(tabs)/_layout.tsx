@@ -1,6 +1,27 @@
 import { Tabs } from 'expo-router'
+import { Platform, View } from 'react-native'
 
 import { colors } from '@/src/theme/ui'
+
+type TabDotProps = {
+  focused: boolean
+}
+
+/**
+ * Small pill that marks the active tab without a missing icon font.
+ * @param focused Whether this tab is selected.
+ */
+const TabDot = ({ focused }: TabDotProps) => (
+  <View
+    style={{
+      width: focused ? 18 : 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: focused ? colors.plum : '#6E5A78',
+      marginBottom: 4,
+    }}
+  />
+)
 
 /**
  * Main tabs after consent: home, scan, yoga, tips, and profile.
@@ -10,9 +31,18 @@ const TabLayout = () => (
     screenOptions={{
       headerStyle: { backgroundColor: colors.bg },
       headerTintColor: colors.ink,
-      tabBarActiveTintColor: colors.plum,
-      tabBarInactiveTintColor: colors.muted,
-      tabBarStyle: { backgroundColor: colors.bg },
+      headerShadowVisible: false,
+      tabBarActiveTintColor: '#FFFFFF',
+      tabBarInactiveTintColor: colors.tabMuted,
+      tabBarIcon: ({ focused }) => <TabDot focused={focused} />,
+      tabBarStyle: {
+        backgroundColor: colors.tab,
+        borderTopWidth: 0,
+        height: Platform.OS === 'web' ? 72 : 64,
+        paddingTop: 8,
+      },
+      tabBarItemStyle: { justifyContent: 'center' },
+      tabBarLabelStyle: { fontSize: 12, fontWeight: '700' },
       sceneStyle: { backgroundColor: colors.bg },
     }}
   >

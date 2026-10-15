@@ -6,6 +6,7 @@ export const findingTitle: Record<FindingCode, string> = {
   under_eye: 'Under-eye darkness',
   texture: 'Uneven texture',
   uneven_tone: 'Uneven tone',
+  blemish: 'Spot-like redness',
 }
 
 /** What to try when a signal shows up. This is care advice, not treatment. */
@@ -18,6 +19,8 @@ export const findingAdvice: Record<FindingCode, string> = {
     'Moisturize on damp skin and introduce exfoliation slowly. Stop if skin stings. Ask a clinician before retinoids if you are pregnant.',
   uneven_tone:
     'Daily sunscreen matters more than any brightening product. Re-take the photo in shade so side light is not read as patchy tone.',
+  blemish:
+    'A small red spot showed up. Leave it alone, cleanse gently, and skip scrubs until it settles. See a clinician if it grows, hurts, or lasts for weeks.',
 }
 
 /**
@@ -28,4 +31,5 @@ export const isFindingCode = (value: string): value is FindingCode =>
   value === 'redness' ||
   value === 'under_eye' ||
   value === 'texture' ||
-  value === 'uneven_tone'
+  value === 'uneven_tone' ||
+  value === 'blemish'

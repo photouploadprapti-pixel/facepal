@@ -1,18 +1,35 @@
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
-/** Shared palette for FacePal screens. */
+/** Palette borrowed from a bright, rounded mobile look. */
 export const colors = {
-  bg: '#FFF8F3',
-  ink: '#241820',
-  muted: '#6E5A62',
-  plum: '#5C3D4E',
-  blush: '#F3D2C7',
-  sage: '#6E8B74',
+  bg: '#F4F2F6',
+  ink: '#1C1424',
+  muted: '#6E6578',
+  plum: '#FF3D8A',
+  blush: '#FFD4E8',
+  sage: '#2FBE86',
   card: '#FFFFFF',
-  line: '#E7D9D2',
-  warn: '#8E3B3B',
-  ok: '#2F6B4F',
+  line: '#EFE8F3',
+  warn: '#E23B6A',
+  ok: '#149A68',
+  sky: '#D9F4FF',
+  lilac: '#E7DEFF',
+  mint: '#D9F8EA',
+  peach: '#FFE4D2',
+  tab: '#24182E',
+  tabMuted: '#C8B8D4',
 }
+
+const shadow = Platform.select({
+  web: { boxShadow: '0 10px 30px rgba(36, 24, 46, 0.08)' },
+  default: {
+    shadowColor: '#24182E',
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+})
 
 /** Shared layout styles. */
 export const ui = StyleSheet.create({
@@ -22,17 +39,19 @@ export const ui = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 32,
-    gap: 14,
+    paddingBottom: 40,
+    gap: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 34,
+    lineHeight: 40,
+    fontWeight: '800',
     color: colors.ink,
+    letterSpacing: -0.6,
   },
   body: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 23,
     color: colors.ink,
   },
   muted: {
@@ -42,50 +61,51 @@ export const ui = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.line,
-    gap: 6,
+    borderRadius: 28,
+    padding: 18,
+    gap: 10,
+    ...shadow,
   },
   button: {
     backgroundColor: colors.plum,
-    borderRadius: 14,
-    minHeight: 48,
+    borderRadius: 999,
+    minHeight: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 22,
+    ...shadow,
   },
   buttonText: {
-    color: '#FFF8F3',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
   },
   ghost: {
-    borderRadius: 14,
-    minHeight: 48,
+    backgroundColor: colors.card,
+    borderRadius: 999,
+    minHeight: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.plum,
+    paddingHorizontal: 22,
+    ...shadow,
   },
   ghostText: {
-    color: colors.plum,
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.ink,
+    fontSize: 17,
+    fontWeight: '700',
   },
   input: {
     backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
     color: colors.ink,
+    ...shadow,
   },
   error: {
     color: colors.warn,
     fontSize: 14,
+    fontWeight: '600',
   },
 })

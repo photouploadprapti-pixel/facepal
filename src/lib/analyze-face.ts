@@ -1,5 +1,6 @@
 import { decode } from 'jpeg-js'
 
+import { skinHeadline, tipsFor } from '@/src/lib/skin-read'
 import type { AnalysisResult, FindingCode } from '@/src/types/models'
 
 const WARN_AT = 58
@@ -52,21 +53,21 @@ const emptyZone = (): ZoneStats => ({
 })
 
 /**
- * Builds the user-facing summary from which signals crossed the warn line.
+ * Builds the user-facing summary from quality and which signals were high.
+ * @param quality Higher means calmer skin in this photo.
  * @param findings Codes that were high enough to mention.
  */
-const summarize = (findings: FindingCode[]): string => {
-  if (findings.length === 0) {
-    return 'No strong signals in this photo. Keep using the oval and even light so each day is comparable.'
-  }
+const summarize = (quality: number, findings: FindingCode[]): string => {
+  const headline = skinHeadline(quality, findings)
+  if (findings.length === 0) return `${headline} No strong warning in this photo.`
   const labels: Record<FindingCode, string> = {
     redness: 'cheeks look more flushed than the forehead',
     under_eye: 'the under-eye area looks darker than the cheeks',
-    texture: 'cheek texture looks rougher in this photo',
-    uneven_tone: 'tone shifts between areas of the face',
+    texture: 'cheek texture looks rougher',
+    uneven_tone: 'tone shifts across the face',
+    blemish: 'small red spots stand out from the surrounding skin',
   }
-  const parts = findings.map((code) => labels[code])
-  return `This photo suggests ${parts.join(', and ')}.`
+  return `${headline} This photo suggests ${findings.map((code) => labels[code]).join(', and ')}.`
 }
 
 /**
@@ -159,19 +160,49 @@ export const scorePixels = (
   const unevenTone =
     quadrantMeans.length === 4 ? clampScore(((toneStd - 10) / 22) * 100) : 0
 
+  let spotPixels = 0
+  let cheekPixels = 0
+  const cheekBaseline = cheekRed
+  for (let y = 0; y < height; y += step) {
+    for (let x = 0; x < width; x += step) {
+      const nx = (x - centerX) / radiusX
+      const ny = (y - centerY) / radiusY
+      if (nx * nx + ny * ny > 1) continue
+      const onCheek = ny > 0.05 && ny < 0.55 && Math.abs(nx) > 0.25
+      const onForehead = ny < -0.15 && Math.abs(nx) < 0.45
+      if (!onCheek && !onForehead) continue
+      const index = (y * width + x) * 4
+      const excess = redExcess(data[index] ?? 0, data[index + 1] ?? 0, data[index + 2] ?? 0)
+      cheekPixels += 1
+      if (excess > cheekBaseline + 22 && excess > 35) spotPixels += 1
+    }
+  }
+  const spotRatio = cheekPixels > 0 ? spotPixels / cheekPixels : 0
+  const blemishes = cheekPixels > 40 ? clampScore(((spotRatio - 0.004) / 0.03) * 100) : 0
+  const quality = clampScore(
+    100 - (redness + underEyeScore + texture + unevenTone + blemishes) / 5,
+  )
+
   const findings: FindingCode[] = []
+  if (blemishes >= WARN_AT) findings.push('blemish')
   if (redness >= WARN_AT) findings.push('redness')
   if (underEyeScore >= WARN_AT) findings.push('under_eye')
   if (texture >= WARN_AT) findings.push('texture')
   if (unevenTone >= WARN_AT) findings.push('uneven_tone')
 
-  return {
+  const partial = {
     redness,
     underEye: underEyeScore,
     texture,
     unevenTone,
+    blemishes,
+    quality,
     findings,
-    summary: summarize(findings),
+  }
+  return {
+    ...partial,
+    summary: summarize(quality, findings),
+    tips: tipsFor(partial),
   }
 }
 
