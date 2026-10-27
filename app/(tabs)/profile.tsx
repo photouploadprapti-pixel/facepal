@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Pressable, Text } from 'react-native'
+import { Pressable, Text, TextInput, View } from 'react-native'
 
+import { AppButton } from '@/src/components/app-button'
 import { Field, Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { deleteMyData } from '@/src/lib/data'
@@ -10,11 +11,14 @@ import { supabase } from '@/src/lib/supabase'
 import { ui } from '@/src/theme/ui'
 
 /**
- * Profile, reminder hour, and a full data delete.
+ * Profile, birth year, reminder hour, and a full data delete.
  */
 const ProfileScreen = () => {
-  const { profile, user, signOut, updateReminderHour } = useAuth()
+  const { profile, user, signOut, updateReminderHour, updateBirthYear } = useAuth()
   const [hour, setHour] = useState(String(profile?.reminderHour ?? 8))
+  const [birthYear, setBirthYear] = useState(
+    profile?.birthYear ? String(profile.birthYear) : '',
+  )
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -32,6 +36,32 @@ const ProfileScreen = () => {
       setMessage(`Reminder set for ${parsed}:00 on this phone.`)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not save reminder')
+    }
+  }
+
+  const saveBirthYear = async (): Promise<void> => {
+    if (!birthYear.trim()) {
+      try {
+        await updateBirthYear(null)
+        setMessage('Birth year cleared.')
+        setError('')
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : 'Could not clear birth year')
+      }
+      return
+    }
+    const year = Number(birthYear)
+    const current = new Date().getFullYear()
+    if (!Number.isInteger(year) || year < current - 100 || year > current - 13) {
+      setError('Enter a birth year that makes you 13–100 years old.')
+      return
+    }
+    try {
+      await updateBirthYear(year)
+      setMessage('Birth year saved for face-age style estimates.')
+      setError('')
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not save birth year')
     }
   }
 
@@ -61,27 +91,49 @@ const ProfileScreen = () => {
 
   return (
     <Screen>
+      <Text style={ui.brand}>Account</Text>
       <Text style={ui.title}>{profile?.displayName || 'Your account'}</Text>
-      <Text style={ui.muted}>{user?.email}</Text>
+      <Text style={ui.subtitle}>{user?.email}</Text>
+
+      <View style={ui.card}>
+        <Text style={ui.kicker}>Privacy</Text>
+        <Text style={ui.body}>
+          Selfies stay in your private FacePal storage. Analysis runs on your device before
+          upload. You can delete everything below.
+        </Text>
+      </View>
+
+      <Field label="Birth year (optional, for face-age style estimates)">
+        <TextInput
+          keyboardType="number-pad"
+          style={ui.input}
+          value={birthYear}
+          onChangeText={setBirthYear}
+          placeholder="e.g. 1998"
+          placeholderTextColor="#8B95A1"
+        />
+      </Field>
+      <AppButton label="Save birth year" variant="ghost" onPress={() => void saveBirthYear()} />
+
       <Field label="Daily reminder hour (0–23)">
         <Text style={ui.input}>{hour}</Text>
       </Field>
       <ViewHour hour={hour} onChange={setHour} />
-      <Pressable style={ui.button} onPress={() => void saveReminder()}>
-        <Text style={ui.buttonText}>Save reminder</Text>
-      </Pressable>
+      <AppButton label="Save reminder" onPress={() => void saveReminder()} />
+
       {message ? <Text style={ui.muted}>{message}</Text> : null}
       {error ? <Text style={ui.error}>{error}</Text> : null}
-      <Pressable style={ui.ghost} onPress={() => void signOut()}>
-        <Text style={ui.ghostText}>Sign out</Text>
-      </Pressable>
-      <Pressable style={ui.ghost} disabled={busy} onPress={() => void wipe()}>
-        <Text style={ui.ghostText}>
-          {busy ? 'Deleting…' : 'Delete my photos, history, and account'}
-        </Text>
-      </Pressable>
-      <Text style={ui.muted}>
-        Selfies are private to your login. Deleting removes them from FacePal storage.
+
+      <AppButton label="Sign out" variant="ghost" onPress={() => void signOut()} />
+      <AppButton
+        label={busy ? 'Deleting…' : 'Delete my photos, history, and account'}
+        variant="ghost"
+        disabled={busy}
+        onPress={() => void wipe()}
+      />
+      <Text style={ui.disclaimer}>
+        FacePal is a wellness tool, not a medical device. It does not diagnose disease or predict
+        clinical outcomes.
       </Text>
     </Screen>
   )
@@ -101,7 +153,9 @@ const ViewHour = ({ hour, onChange }: ViewHourProps) => (
   <>
     {['7', '8', '20', '21'].map((choice) => (
       <Pressable key={choice} style={ui.ghost} onPress={() => onChange(choice)}>
-        <Text style={ui.ghostText}>{choice}:00{hour === choice ? ' · selected' : ''}</Text>
+        <Text style={ui.ghostText}>
+          {choice}:00{hour === choice ? ' · selected' : ''}
+        </Text>
       </Pressable>
     ))}
   </>

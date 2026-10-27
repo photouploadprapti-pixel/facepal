@@ -32,9 +32,11 @@ const TipsScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.muted}>
-        Habits that support a rested look. Products help less than sleep, sunscreen, and not
-        smoking.
+      <Text style={ui.brand}>Care</Text>
+      <Text style={ui.title}>Youth habits</Text>
+      <Text style={ui.subtitle}>
+        Habits that support a rested look. Sleep, sunscreen, and not smoking matter more than most
+        products.
       </Text>
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {tips.map((tip) => (

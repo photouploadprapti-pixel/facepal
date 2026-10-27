@@ -82,9 +82,21 @@ if (spotted.blemishes < 40) {
   throw new Error(`Expected spot signal, got ${spotted.blemishes}`)
 }
 
+if (!Array.isArray(calm.regions) || calm.regions.length < 4) {
+  throw new Error('Expected region insights')
+}
+if (typeof calm.appearanceLoad !== 'number') {
+  throw new Error('Expected appearanceLoad')
+}
+if (!calm.photoQuality || typeof calm.photoQuality.score !== 'number') {
+  throw new Error('Expected photo quality')
+}
+
 console.log('analysis checks passed', {
   calm: calm.quality,
   flushed: flushed.redness,
   tired: tired.underEye,
   spots: spotted.blemishes,
+  load: calm.appearanceLoad,
+  photo: calm.photoQuality.score,
 })

@@ -33,7 +33,9 @@ const YogaListScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.muted}>
+      <Text style={ui.brand}>Practice</Text>
+      <Text style={ui.title}>Face yoga</Text>
+      <Text style={ui.subtitle}>
         Short guided sessions for the jaw, eyes, forehead, and cheeks. Follow the animation,
         then the video when a routine has one.
       </Text>

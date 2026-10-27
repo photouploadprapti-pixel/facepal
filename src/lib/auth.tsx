@@ -17,6 +17,7 @@ type AuthContextValue = {
   signOut: () => Promise<void>
   acceptConsent: () => Promise<void>
   updateReminderHour: (hour: number) => Promise<void>
+  updateBirthYear: (year: number | null) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -145,6 +146,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [session],
   )
 
+  const updateBirthYear = useCallback(
+    async (year: number | null) => {
+      const userId = session?.user.id
+      if (!userId) throw new Error('Sign in first')
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ birth_year: year })
+        .eq('id', userId)
+        .select('*')
+        .single()
+      if (error) throw new Error(error.message)
+      const next = parseProfile(data)
+      if (next) setProfile(next)
+    },
+    [session],
+  )
+
   const value = useMemo<AuthContextValue>(
     () => ({
       session,
@@ -157,6 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signOut,
       acceptConsent,
       updateReminderHour,
+      updateBirthYear,
     }),
     [
       session,
@@ -168,6 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       signOut,
       acceptConsent,
       updateReminderHour,
+      updateBirthYear,
     ],
   )
 

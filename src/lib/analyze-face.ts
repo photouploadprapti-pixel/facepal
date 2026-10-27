@@ -1,6 +1,12 @@
 import { decode } from 'jpeg-js'
 
-import { skinHeadline, tipsFor } from '@/src/lib/skin-read'
+import { assessPhotoQuality } from '@/src/lib/photo-quality'
+import {
+  appearanceLoadFromQuality,
+  regionInsights,
+  skinHeadline,
+  tipsFor,
+} from '@/src/lib/skin-read'
 import type { AnalysisResult, FindingCode } from '@/src/types/models'
 
 const WARN_AT = 58
@@ -56,9 +62,14 @@ const emptyZone = (): ZoneStats => ({
  * Builds the user-facing summary from quality and which signals were high.
  * @param quality Higher means calmer skin in this photo.
  * @param findings Codes that were high enough to mention.
+ * @param appearanceLoad Rough years of wear from this photo.
  */
-const summarize = (quality: number, findings: FindingCode[]): string => {
-  const headline = skinHeadline(quality, findings)
+const summarize = (
+  quality: number,
+  findings: FindingCode[],
+  appearanceLoad: number,
+): string => {
+  const headline = skinHeadline(quality, findings, appearanceLoad)
   if (findings.length === 0) return `${headline} No strong warning in this photo.`
   const labels: Record<FindingCode, string> = {
     redness: 'cheeks look more flushed than the forehead',
@@ -81,6 +92,7 @@ export const scorePixels = (
   height: number,
   data: Uint8Array,
 ): AnalysisResult => {
+  const photoQualityRaw = assessPhotoQuality(width, height, data)
   const centerX = width / 2
   const centerY = height * 0.46
   const radiusX = width * 0.32
@@ -182,6 +194,7 @@ export const scorePixels = (
   const quality = clampScore(
     100 - (redness + underEyeScore + texture + unevenTone + blemishes) / 5,
   )
+  const appearanceLoad = appearanceLoadFromQuality(quality)
 
   const findings: FindingCode[] = []
   if (blemishes >= WARN_AT) findings.push('blemish')
@@ -201,7 +214,14 @@ export const scorePixels = (
   }
   return {
     ...partial,
-    summary: summarize(quality, findings),
+    appearanceLoad,
+    regions: regionInsights(partial),
+    photoQuality: {
+      score: photoQualityRaw.score,
+      ok: photoQualityRaw.ok,
+      issues: photoQualityRaw.issues,
+    },
+    summary: summarize(quality, findings, appearanceLoad),
     tips: tipsFor(partial),
   }
 }

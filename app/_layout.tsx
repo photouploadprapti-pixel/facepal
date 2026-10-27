@@ -16,16 +16,16 @@ const RootLayout = (): ReactNode => (
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#F4F2F6' },
-          headerTintColor: '#1C1424',
+          headerStyle: { backgroundColor: '#F7F6F4' },
+          headerTintColor: '#1A1F24',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#F4F2F6' },
+          contentStyle: { backgroundColor: '#F7F6F4' },
         }}
       >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="consent" options={{ title: 'Your photos' }} />
-        <Stack.Screen name="review" options={{ title: 'Today’s check' }} />
+        <Stack.Screen name="consent" options={{ title: 'Privacy' }} />
+        <Stack.Screen name="review" options={{ title: 'Today’s read' }} />
         <Stack.Screen name="history" options={{ title: 'History' }} />
         <Stack.Screen name="compare" options={{ title: 'Compare' }} />
         <Stack.Screen name="yoga/[slug]" options={{ title: 'Face yoga' }} />

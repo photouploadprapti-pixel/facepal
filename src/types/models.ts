@@ -20,9 +20,25 @@ export type AnimationKey =
 export type Profile = {
   id: string
   displayName: string
+  birthYear: number | null
   consentAcceptedAt: string | null
   reminderHour: number
   createdAt: string
+}
+
+/** Face zone that contributed to the skin read. */
+export type RegionInsight = {
+  id: 'forehead' | 'under_eye' | 'cheeks' | 'spots'
+  label: string
+  score: number
+  note: string
+}
+
+/** Lighting readiness of the captured selfie. */
+export type PhotoQualityInfo = {
+  score: number
+  ok: boolean
+  issues: string[]
 }
 
 /** One saved daily selfie and its scores. */
@@ -80,7 +96,11 @@ export type AnalysisResult = {
   unevenTone: number
   blemishes: number
   quality: number
+  /** Rough years of “appearance load” relative to a rested look. Higher means more worn. */
+  appearanceLoad: number
   findings: FindingCode[]
+  regions: RegionInsight[]
+  photoQuality: PhotoQualityInfo
   summary: string
   tips: string[]
 }

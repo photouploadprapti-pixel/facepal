@@ -2,6 +2,7 @@ import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, Text, TextInput } from 'react-native'
 
+import { AppButton } from '@/src/components/app-button'
 import { Field, Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { ui } from '@/src/theme/ui'
@@ -30,9 +31,10 @@ const SignInScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.title}>FacePal</Text>
-      <Text style={ui.muted}>
-        Daily selfie check, care tips, and face yoga. Photos stay in your account.
+      <Text style={ui.brand}>FacePal</Text>
+      <Text style={ui.title}>Look after your face, daily.</Text>
+      <Text style={ui.subtitle}>
+        Professional skin reads, habits, and face yoga — designed for consistent selfies.
       </Text>
       <Field label="Email">
         <TextInput
@@ -47,14 +49,19 @@ const SignInScreen = () => {
         <TextInput secureTextEntry style={ui.input} value={password} onChangeText={setPassword} />
       </Field>
       {error ? <Text style={ui.error}>{error}</Text> : null}
-      <Pressable style={ui.button} disabled={busy} onPress={() => void submit()}>
-        <Text style={ui.buttonText}>{busy ? 'Signing in…' : 'Sign in'}</Text>
-      </Pressable>
+      <AppButton
+        label={busy ? 'Signing in…' : 'Sign in'}
+        disabled={busy}
+        onPress={() => void submit()}
+      />
       <Link href="/sign-up" asChild>
         <Pressable style={ui.ghost}>
           <Text style={ui.ghostText}>Create an account</Text>
         </Pressable>
       </Link>
+      <Text style={ui.disclaimer}>
+        Wellness tool only. Not a medical device and not for clinical decisions.
+      </Text>
     </Screen>
   )
 }

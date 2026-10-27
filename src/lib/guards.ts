@@ -67,12 +67,16 @@ export const parseProfile = (value: unknown): Profile | null => {
   const reminderHour = readNumber(row, 'reminder_hour')
   const displayName = row.display_name
   const consent = row.consent_accepted_at
+  const birthYearRaw = row.birth_year
   if (!id || !createdAt || reminderHour === null) return null
   if (typeof displayName !== 'string') return null
   if (consent !== null && typeof consent !== 'string') return null
+  const birthYear =
+    typeof birthYearRaw === 'number' && Number.isInteger(birthYearRaw) ? birthYearRaw : null
   return {
     id,
     displayName,
+    birthYear,
     consentAcceptedAt: consent,
     reminderHour,
     createdAt,

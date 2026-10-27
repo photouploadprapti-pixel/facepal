@@ -57,12 +57,15 @@ const ScanScreen = () => {
       <CameraView ref={cameraRef} style={styles.fill} facing="front" mirror />
       <View style={styles.overlay} pointerEvents="none">
         <View style={styles.oval} />
-        <Text style={styles.hint}>Center your face in the oval, in even light.</Text>
+        <Text style={styles.hint}>
+          Center your face in the oval. Use soft, even light — FacePal checks photo quality before
+          scoring.
+        </Text>
       </View>
       <View style={styles.bar}>
-        {error ? <Text style={ui.error}>{error}</Text> : null}
+        {error ? <Text style={[ui.error, { color: '#FCA5A5' }]}>{error}</Text> : null}
         <Pressable style={ui.button} disabled={busy} onPress={() => void capture()}>
-          <Text style={ui.buttonText}>{busy ? 'Working…' : 'Capture'}</Text>
+          <Text style={ui.buttonText}>{busy ? 'Working…' : 'Capture selfie'}</Text>
         </Pressable>
       </View>
     </View>
@@ -88,15 +91,16 @@ const styles = StyleSheet.create({
     height: 320,
     borderRadius: 120,
     borderWidth: 3,
-    borderColor: '#FFF8F3',
+    borderColor: '#5EEAD4',
     backgroundColor: 'transparent',
   },
   hint: {
     marginTop: 16,
-    color: '#FFF8F3',
-    fontSize: 15,
+    color: '#E5E7EB',
+    fontSize: 14,
+    lineHeight: 20,
     textAlign: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 28,
   },
   bar: {
     position: 'absolute',

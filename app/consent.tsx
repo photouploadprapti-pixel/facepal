@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Pressable, Text } from 'react-native'
+import { Text, View } from 'react-native'
 
+import { AppButton } from '@/src/components/app-button'
 import { Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
-import { ui } from '@/src/theme/ui'
+import { colors, ui } from '@/src/theme/ui'
 
 /**
  * Records explicit consent before any selfie is stored.
@@ -27,20 +28,31 @@ const ConsentScreen = () => {
 
   return (
     <Screen>
+      <Text style={ui.brand}>Privacy first</Text>
       <Text style={ui.title}>Before you start</Text>
-      <Text style={ui.body}>
-        FacePal takes a selfie to estimate flushed skin, under-eye darkness, texture, and uneven
-        tone. The check runs on your phone. The photo is then saved in your private FacePal
-        storage so you can look back and compare.
-      </Text>
-      <Text style={ui.body}>
-        This is not a medical device and it does not diagnose skin disease. You can delete your
-        photos, history, and account from the You tab.
-      </Text>
+      <View style={[ui.card, { backgroundColor: colors.sky }]}>
+        <Text style={ui.body}>
+          FacePal captures a selfie to estimate flush, under-eye darkness, texture, uneven tone,
+          and spot-like redness. The check runs on your device. The photo is then saved privately
+          so you can track trends and compare days.
+        </Text>
+      </View>
+      <View style={ui.card}>
+        <Text style={ui.kicker}>Important</Text>
+        <Text style={ui.body}>
+          FacePal is not a medical device. It does not diagnose skin disease, estimate clinical
+          biological age for care decisions, or predict survival or disease risk.
+        </Text>
+        <Text style={ui.body}>
+          You can delete your photos, history, and account anytime from the You tab.
+        </Text>
+      </View>
       {error ? <Text style={ui.error}>{error}</Text> : null}
-      <Pressable style={ui.button} disabled={busy} onPress={() => void agree()}>
-        <Text style={ui.buttonText}>{busy ? 'Saving…' : 'I agree, store my selfies'}</Text>
-      </Pressable>
+      <AppButton
+        label={busy ? 'Saving…' : 'I agree, store my selfies'}
+        disabled={busy}
+        onPress={() => void agree()}
+      />
     </Screen>
   )
 }

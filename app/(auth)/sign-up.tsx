@@ -2,6 +2,7 @@ import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, Text, TextInput } from 'react-native'
 
+import { AppButton } from '@/src/components/app-button'
 import { Field, Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { ui } from '@/src/theme/ui'
@@ -34,7 +35,9 @@ const SignUpScreen = () => {
 
   return (
     <Screen>
+      <Text style={ui.brand}>FacePal</Text>
       <Text style={ui.title}>Create account</Text>
+      <Text style={ui.subtitle}>Your photos stay private to this login.</Text>
       <Field label="Name">
         <TextInput style={ui.input} value={name} onChangeText={setName} />
       </Field>
@@ -52,9 +55,11 @@ const SignUpScreen = () => {
       </Field>
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {notice ? <Text style={ui.muted}>{notice}</Text> : null}
-      <Pressable style={ui.button} disabled={busy} onPress={() => void submit()}>
-        <Text style={ui.buttonText}>{busy ? 'Creating…' : 'Create account'}</Text>
-      </Pressable>
+      <AppButton
+        label={busy ? 'Creating…' : 'Create account'}
+        disabled={busy}
+        onPress={() => void submit()}
+      />
       <Link href="/sign-in" asChild>
         <Pressable style={ui.ghost}>
           <Text style={ui.ghostText}>I already have an account</Text>

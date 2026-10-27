@@ -1,14 +1,15 @@
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Pressable, Text } from 'react-native'
+import { Text } from 'react-native'
 
 import { AnalysisCard } from '@/src/components/analysis-card'
+import { AppButton } from '@/src/components/app-button'
 import { Screen } from '@/src/components/screen'
 import { analyzeJpeg } from '@/src/lib/analyze-face'
 import { useAuth } from '@/src/lib/auth'
 import { decodeBase64, fetchCheckins, saveCheckin } from '@/src/lib/data'
 import { peekPendingScan, takePendingScan } from '@/src/lib/pending-scan'
-import { compareReads } from '@/src/lib/skin-read'
+import { ageFromBirthYear, compareReads } from '@/src/lib/skin-read'
 import { streakFromDates } from '@/src/lib/streak'
 import { ui } from '@/src/theme/ui'
 import type { AnalysisResult, Checkin } from '@/src/types/models'
@@ -18,7 +19,7 @@ import type { AnalysisResult, Checkin } from '@/src/types/models'
  */
 const ReviewScreen = () => {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [base64, setBase64] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
   const [previous, setPrevious] = useState<Checkin[]>([])
@@ -63,26 +64,38 @@ const ReviewScreen = () => {
     new Date().toISOString(),
   ])
   const compareLines = analysis && last ? compareReads(analysis, last, streak) : []
+  const age = ageFromBirthYear(profile?.birthYear ?? null)
 
   return (
     <Screen>
+      <Text style={ui.brand}>Daily check</Text>
       <Text style={ui.title}>Today’s read</Text>
-      {analysis ? <AnalysisCard analysis={analysis} compareLines={compareLines} /> : null}
+      <Text style={ui.subtitle}>
+        Review what this photo shows, then save it to your private history.
+      </Text>
+      {analysis ? (
+        <AnalysisCard
+          analysis={analysis}
+          compareLines={compareLines}
+          chronologicalAge={age}
+        />
+      ) : null}
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {analysis ? (
-        <Pressable style={ui.button} disabled={busy} onPress={() => void save()}>
-          <Text style={ui.buttonText}>{busy ? 'Saving…' : 'Save this read'}</Text>
-        </Pressable>
+        <AppButton
+          label={busy ? 'Saving…' : 'Save this read'}
+          disabled={busy}
+          onPress={() => void save()}
+        />
       ) : null}
-      <Pressable
-        style={ui.ghost}
+      <AppButton
+        label={analysis && !analysis.photoQuality.ok ? 'Retake photo' : 'Discard'}
+        variant="ghost"
         onPress={() => {
           takePendingScan()
-          router.back()
+          router.replace('/scan')
         }}
-      >
-        <Text style={ui.ghostText}>Discard</Text>
-      </Pressable>
+      />
     </Screen>
   )
 }
