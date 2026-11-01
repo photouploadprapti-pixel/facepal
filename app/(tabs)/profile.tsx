@@ -1,21 +1,39 @@
-import { useState } from 'react'
-import { Pressable, Text, TextInput, View } from 'react-native'
+import * as ImageManipulator from 'expo-image-manipulator'
+import * as ImagePicker from 'expo-image-picker'
+import { useEffect, useState } from 'react'
+import { Image, Pressable, Text, TextInput, View } from 'react-native'
 
 import { AppButton, BrandMark } from '@/src/components/app-button'
-import { IconChip } from '@/src/components/app-icon'
+import { AppIcon, IconChip } from '@/src/components/app-icon'
 import { Field, Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
+import { publicAvatarUrl } from '@/src/lib/avatar'
 import { deleteMyData } from '@/src/lib/data'
 import { supabaseKey, supabaseUrl } from '@/src/lib/env'
 import { scheduleDailyReminder } from '@/src/lib/reminders'
 import { supabase } from '@/src/lib/supabase'
-import { ui } from '@/src/theme/ui'
+import { colors, ui } from '@/src/theme/ui'
 
 /**
- * Profile, birth year, reminder hour, and a full data delete.
+ * Account settings: avatar, name, email, password, birth year, reminder, delete.
  */
 const ProfileScreen = () => {
-  const { profile, user, signOut, updateReminderHour, updateBirthYear } = useAuth()
+  const {
+    profile,
+    user,
+    signOut,
+    updateReminderHour,
+    updateBirthYear,
+    updateDisplayName,
+    updateEmail,
+    updatePassword,
+    updateAvatar,
+  } = useAuth()
+  const [displayName, setDisplayName] = useState(profile?.displayName ?? '')
+  const [email, setEmail] = useState(user?.email ?? '')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [nextPassword, setNextPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [hour, setHour] = useState(String(profile?.reminderHour ?? 8))
   const [birthYear, setBirthYear] = useState(
     profile?.birthYear ? String(profile.birthYear) : '',
@@ -23,6 +41,87 @@ const ProfileScreen = () => {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [avatarBusy, setAvatarBusy] = useState(false)
+
+  useEffect(() => {
+    setDisplayName(profile?.displayName ?? '')
+    setBirthYear(profile?.birthYear ? String(profile.birthYear) : '')
+    setHour(String(profile?.reminderHour ?? 8))
+  }, [profile])
+
+  useEffect(() => {
+    setEmail(user?.email ?? '')
+  }, [user?.email])
+
+  const avatarUri = publicAvatarUrl(profile?.avatarUrl)
+
+  const saveName = async (): Promise<void> => {
+    try {
+      await updateDisplayName(displayName)
+      setMessage('Display name saved.')
+      setError('')
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not save name')
+    }
+  }
+
+  const saveEmail = async (): Promise<void> => {
+    try {
+      const note = await updateEmail(email)
+      setMessage(note)
+      setError('')
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not update email')
+    }
+  }
+
+  const savePassword = async (): Promise<void> => {
+    if (nextPassword !== confirmPassword) {
+      setError('New password and confirmation do not match.')
+      return
+    }
+    try {
+      await updatePassword(currentPassword, nextPassword)
+      setCurrentPassword('')
+      setNextPassword('')
+      setConfirmPassword('')
+      setMessage('Password updated.')
+      setError('')
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not update password')
+    }
+  }
+
+  const pickAvatar = async (): Promise<void> => {
+    setAvatarBusy(true)
+    setError('')
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (!permission.granted) {
+        setError('Photo library permission is required for a profile picture.')
+        return
+      }
+      const picked = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85,
+      })
+      if (picked.canceled || !picked.assets[0]) return
+      const resized = await ImageManipulator.manipulateAsync(
+        picked.assets[0].uri,
+        [{ resize: { width: 512 } }],
+        { compress: 0.85, format: ImageManipulator.SaveFormat.JPEG, base64: true },
+      )
+      if (!resized.base64) throw new Error('Could not read the selected photo')
+      await updateAvatar(resized.base64)
+      setMessage('Profile picture updated.')
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not update photo')
+    } finally {
+      setAvatarBusy(false)
+    }
+  }
 
   const saveReminder = async (): Promise<void> => {
     const parsed = Number(hour)
@@ -92,17 +191,122 @@ const ProfileScreen = () => {
 
   return (
     <Screen>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <BrandMark size={44} />
-        <View style={{ flex: 1 }}>
+      <View style={styles.header}>
+        <Pressable onPress={() => void pickAvatar()} style={styles.avatarWrap}>
+          {avatarUri ? (
+            <Image source={{ uri: avatarUri }} style={styles.avatar} />
+          ) : (
+            <BrandMark size={72} />
+          )}
+          <View style={styles.cameraBadge}>
+            <AppIcon name="camera" size={14} color="#FFFFFF" />
+          </View>
+        </Pressable>
+        <View style={{ flex: 1, gap: 2 }}>
           <Text style={ui.brand}>Account</Text>
           <Text style={ui.title}>{profile?.displayName || 'Your account'}</Text>
+          <Text style={ui.muted}>{user?.email}</Text>
+          <Text style={[ui.muted, { fontWeight: '700', color: colors.plum }]}>
+            {avatarBusy ? 'Uploading photo…' : 'Tap photo to change'}
+          </Text>
         </View>
       </View>
-      <Text style={ui.subtitle}>{user?.email}</Text>
 
       <View style={ui.card}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={styles.inline}>
+          <IconChip name="person" tone="navy" />
+          <Text style={ui.kicker}>Edit profile</Text>
+        </View>
+        <Field label="Display name">
+          <TextInput
+            style={ui.input}
+            value={displayName}
+            onChangeText={setDisplayName}
+            placeholder="Your name"
+            placeholderTextColor="#8B95A1"
+            autoCapitalize="words"
+          />
+        </Field>
+        <AppButton
+          label="Save name"
+          variant="ghost"
+          icon="checkmark-outline"
+          onPress={() => void saveName()}
+        />
+      </View>
+
+      <View style={ui.card}>
+        <View style={styles.inline}>
+          <IconChip name="mail" tone="sky" />
+          <Text style={ui.kicker}>Email</Text>
+        </View>
+        <Text style={ui.muted}>
+          Changing email sends a confirmation link. Keep access to both addresses until confirmed.
+        </Text>
+        <Field label="Email address">
+          <TextInput
+            autoCapitalize="none"
+            keyboardType="email-address"
+            style={ui.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@email.com"
+            placeholderTextColor="#8B95A1"
+          />
+        </Field>
+        <AppButton
+          label="Update email"
+          variant="ghost"
+          icon="mail-outline"
+          onPress={() => void saveEmail()}
+        />
+      </View>
+
+      <View style={ui.card}>
+        <View style={styles.inline}>
+          <IconChip name="lock-closed" tone="mauve" />
+          <Text style={ui.kicker}>Password</Text>
+        </View>
+        <Field label="Current password">
+          <TextInput
+            secureTextEntry
+            style={ui.input}
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            placeholder="Current password"
+            placeholderTextColor="#8B95A1"
+          />
+        </Field>
+        <Field label="New password (min 8 characters)">
+          <TextInput
+            secureTextEntry
+            style={ui.input}
+            value={nextPassword}
+            onChangeText={setNextPassword}
+            placeholder="New password"
+            placeholderTextColor="#8B95A1"
+          />
+        </Field>
+        <Field label="Confirm new password">
+          <TextInput
+            secureTextEntry
+            style={ui.input}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder="Confirm new password"
+            placeholderTextColor="#8B95A1"
+          />
+        </Field>
+        <AppButton
+          label="Change password"
+          variant="ghost"
+          icon="key-outline"
+          onPress={() => void savePassword()}
+        />
+      </View>
+
+      <View style={ui.card}>
+        <View style={styles.inline}>
           <IconChip name="shield-checkmark" tone="navy" />
           <Text style={ui.kicker}>Privacy</Text>
         </View>
@@ -113,7 +317,7 @@ const ProfileScreen = () => {
       </View>
 
       <View style={ui.card}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={styles.inline}>
           <IconChip name="calendar" tone="sky" />
           <Text style={ui.kicker}>Birth year</Text>
         </View>
@@ -195,5 +399,41 @@ const ViewHour = ({ hour, onChange }: ViewHourProps) => (
     ))}
   </>
 )
+
+const styles = {
+  header: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 14,
+  },
+  inline: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 8,
+  },
+  avatarWrap: {
+    position: 'relative' as const,
+  },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: colors.plum,
+  },
+  cameraBadge: {
+    position: 'absolute' as const,
+    right: -2,
+    bottom: -2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.midnight,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    borderWidth: 2,
+    borderColor: colors.plumSoft,
+  },
+}
 
 export default ProfileScreen

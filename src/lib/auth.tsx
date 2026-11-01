@@ -2,6 +2,7 @@ import type { Session, User } from '@supabase/supabase-js'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { decodeBase64 } from '@/src/lib/data'
 import { parseProfile } from '@/src/lib/guards'
 import { supabase } from '@/src/lib/supabase'
 import type { Profile } from '@/src/types/models'
@@ -18,6 +19,11 @@ type AuthContextValue = {
   acceptConsent: () => Promise<void>
   updateReminderHour: (hour: number) => Promise<void>
   updateBirthYear: (year: number | null) => Promise<void>
+  updateDisplayName: (name: string) => Promise<void>
+  updateEmail: (email: string) => Promise<string>
+  updatePassword: (currentPassword: string, nextPassword: string) => Promise<void>
+  updateAvatar: (jpegBase64: string) => Promise<void>
+  requestPasswordReset: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -163,6 +169,88 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [session],
   )
 
+  const updateDisplayName = useCallback(
+    async (name: string) => {
+      const userId = session?.user.id
+      if (!userId) throw new Error('Sign in first')
+      const trimmed = name.trim()
+      if (trimmed.length < 2) throw new Error('Name needs at least 2 characters')
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ display_name: trimmed })
+        .eq('id', userId)
+        .select('*')
+        .single()
+      if (error) throw new Error(error.message)
+      const { error: metaError } = await supabase.auth.updateUser({
+        data: { display_name: trimmed },
+      })
+      if (metaError) throw new Error(metaError.message)
+      const next = parseProfile(data)
+      if (next) setProfile(next)
+    },
+    [session],
+  )
+
+  const updateEmail = useCallback(async (email: string) => {
+    const trimmed = email.trim().toLowerCase()
+    if (!trimmed.includes('@')) throw new Error('Enter a valid email address')
+    const { error } = await supabase.auth.updateUser({ email: trimmed })
+    if (error) throw new Error(error.message)
+    return 'Check both inboxes to confirm the email change.'
+  }, [])
+
+  const updatePassword = useCallback(
+    async (currentPassword: string, nextPassword: string) => {
+      const email = session?.user.email
+      if (!email) throw new Error('Sign in first')
+      if (nextPassword.length < 8) throw new Error('New password needs at least 8 characters')
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword,
+      })
+      if (verifyError) throw new Error('Current password is incorrect')
+      const { error } = await supabase.auth.updateUser({ password: nextPassword })
+      if (error) throw new Error(error.message)
+    },
+    [session],
+  )
+
+  const updateAvatar = useCallback(
+    async (jpegBase64: string) => {
+      const userId = session?.user.id
+      if (!userId) throw new Error('Sign in first')
+      const bytes = decodeBase64(jpegBase64)
+      const previous = profile?.avatarUrl
+      const path = `${userId}/avatar-${Date.now()}.jpg`
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, bytes, {
+        contentType: 'image/jpeg',
+        upsert: false,
+      })
+      if (uploadError) throw new Error(uploadError.message)
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: path })
+        .eq('id', userId)
+        .select('*')
+        .single()
+      if (error) throw new Error(error.message)
+      if (previous && previous !== path) {
+        await supabase.storage.from('avatars').remove([previous])
+      }
+      const next = parseProfile(data)
+      if (next) setProfile(next)
+    },
+    [session, profile?.avatarUrl],
+  )
+
+  const requestPasswordReset = useCallback(async (email: string) => {
+    const trimmed = email.trim().toLowerCase()
+    if (!trimmed.includes('@')) throw new Error('Enter a valid email address')
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmed)
+    if (error) throw new Error(error.message)
+  }, [])
+
   const value = useMemo<AuthContextValue>(
     () => ({
       session,
@@ -176,6 +264,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       acceptConsent,
       updateReminderHour,
       updateBirthYear,
+      updateDisplayName,
+      updateEmail,
+      updatePassword,
+      updateAvatar,
+      requestPasswordReset,
     }),
     [
       session,
@@ -188,6 +281,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       acceptConsent,
       updateReminderHour,
       updateBirthYear,
+      updateDisplayName,
+      updateEmail,
+      updatePassword,
+      updateAvatar,
+      requestPasswordReset,
     ],
   )
 

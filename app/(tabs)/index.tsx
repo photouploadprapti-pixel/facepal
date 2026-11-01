@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter, type Href } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { Text, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
 
 import { AnalysisCard } from '@/src/components/analysis-card'
 import { AppButton, BrandMark } from '@/src/components/app-button'
@@ -8,8 +8,9 @@ import { AppIcon, IconChip } from '@/src/components/app-icon'
 import { HabitSummary } from '@/src/components/habit-summary'
 import { Screen } from '@/src/components/screen'
 import { TrendSpark } from '@/src/components/trend-spark'
-import { fetchCheckins, fetchHabitDay, fetchHabitDays } from '@/src/lib/data'
 import { useAuth } from '@/src/lib/auth'
+import { publicAvatarUrl } from '@/src/lib/avatar'
+import { fetchCheckins, fetchHabitDay, fetchHabitDays } from '@/src/lib/data'
 import {
   localDayKey,
   tonightFocus,
@@ -74,7 +75,14 @@ const HomeScreen = () => {
   return (
     <Screen>
       <View style={styles.header}>
-        <BrandMark size={42} />
+        {profile?.avatarUrl ? (
+          <Image
+            source={{ uri: publicAvatarUrl(profile.avatarUrl) ?? undefined }}
+            style={styles.homeAvatar}
+          />
+        ) : (
+          <BrandMark size={42} />
+        )}
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={ui.brand}>FacePal</Text>
           <Text style={ui.title}>Hello, {name}</Text>
@@ -168,6 +176,13 @@ const styles = {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     gap: 12,
+  },
+  homeAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: colors.plum,
   },
   inline: {
     flexDirection: 'row' as const,

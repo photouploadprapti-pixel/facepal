@@ -1,4 +1,4 @@
-import { Link } from 'expo-router'
+import { Link, type Href } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 
@@ -58,6 +58,11 @@ const SignInScreen = () => {
         disabled={busy}
         onPress={() => void submit()}
       />
+      <Link href={'/forgot-password' as Href} asChild>
+        <Pressable style={ui.ghost}>
+          <Text style={ui.ghostText}>Forgot password?</Text>
+        </Pressable>
+      </Link>
       <Link href="/sign-up" asChild>
         <Pressable style={ui.ghost}>
           <Text style={ui.ghostText}>Create an account</Text>

@@ -74,9 +74,12 @@ export const parseProfile = (value: unknown): Profile | null => {
   if (consent !== null && typeof consent !== 'string') return null
   const birthYear =
     typeof birthYearRaw === 'number' && Number.isInteger(birthYearRaw) ? birthYearRaw : null
+  const avatarRaw = row.avatar_url
+  const avatarUrl = typeof avatarRaw === 'string' && avatarRaw.length > 0 ? avatarRaw : null
   return {
     id,
     displayName,
+    avatarUrl,
     birthYear,
     consentAcceptedAt: consent,
     reminderHour,

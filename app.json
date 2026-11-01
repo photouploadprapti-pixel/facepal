@@ -46,6 +46,12 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "FacePal uses your photos for an optional profile picture."
+        }
+      ],
+      [
         "expo-notifications",
         {
           "color": "#C18DB4"

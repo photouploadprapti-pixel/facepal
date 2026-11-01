@@ -20,6 +20,7 @@ export type AnimationKey =
 export type Profile = {
   id: string
   displayName: string
+  avatarUrl: string | null
   birthYear: number | null
   consentAcceptedAt: string | null
   reminderHour: number
