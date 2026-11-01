@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { Text, View } from 'react-native'
 
 import { AnalysisCard } from '@/src/components/analysis-card'
+import { IconChip } from '@/src/components/app-icon'
 import { Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { fetchCheckins } from '@/src/lib/data'
@@ -37,7 +38,10 @@ const HistoryScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>History</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <IconChip name="time" tone="sky" />
+        <Text style={ui.brand}>History</Text>
+      </View>
       <Text style={ui.title}>Past reads</Text>
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {rows.length === 0 ? <Text style={ui.muted}>No check-ins yet.</Text> : null}

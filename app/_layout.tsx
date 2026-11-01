@@ -16,10 +16,10 @@ const RootLayout = (): ReactNode => (
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#F4E8EE' },
+          headerStyle: { backgroundColor: '#F3E6EE' },
           headerTintColor: '#0E1B48',
           headerShadowVisible: false,
-          contentStyle: { backgroundColor: '#F4E8EE' },
+          contentStyle: { backgroundColor: '#F3E6EE' },
         }}
       >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />

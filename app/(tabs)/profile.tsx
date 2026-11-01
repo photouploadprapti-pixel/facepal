@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 
-import { AppButton } from '@/src/components/app-button'
+import { AppButton, BrandMark } from '@/src/components/app-button'
+import { IconChip } from '@/src/components/app-icon'
 import { Field, Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { deleteMyData } from '@/src/lib/data'
@@ -91,12 +92,20 @@ const ProfileScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>Account</Text>
-      <Text style={ui.title}>{profile?.displayName || 'Your account'}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <BrandMark size={44} />
+        <View style={{ flex: 1 }}>
+          <Text style={ui.brand}>Account</Text>
+          <Text style={ui.title}>{profile?.displayName || 'Your account'}</Text>
+        </View>
+      </View>
       <Text style={ui.subtitle}>{user?.email}</Text>
 
       <View style={ui.card}>
-        <Text style={ui.kicker}>Privacy</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <IconChip name="shield-checkmark" tone="navy" />
+          <Text style={ui.kicker}>Privacy</Text>
+        </View>
         <Text style={ui.body}>
           Selfies stay in your private FacePal storage. Analysis runs on your device before
           upload. You can delete everything below.
@@ -113,21 +122,36 @@ const ProfileScreen = () => {
           placeholderTextColor="#8B95A1"
         />
       </Field>
-      <AppButton label="Save birth year" variant="ghost" onPress={() => void saveBirthYear()} />
+      <AppButton
+        label="Save birth year"
+        variant="ghost"
+        icon="calendar-outline"
+        onPress={() => void saveBirthYear()}
+      />
 
       <Field label="Daily reminder hour (0–23)">
         <Text style={ui.input}>{hour}</Text>
       </Field>
       <ViewHour hour={hour} onChange={setHour} />
-      <AppButton label="Save reminder" onPress={() => void saveReminder()} />
+      <AppButton
+        label="Save reminder"
+        icon="notifications-outline"
+        onPress={() => void saveReminder()}
+      />
 
       {message ? <Text style={ui.muted}>{message}</Text> : null}
       {error ? <Text style={ui.error}>{error}</Text> : null}
 
-      <AppButton label="Sign out" variant="ghost" onPress={() => void signOut()} />
+      <AppButton
+        label="Sign out"
+        variant="ghost"
+        icon="log-out-outline"
+        onPress={() => void signOut()}
+      />
       <AppButton
         label={busy ? 'Deleting…' : 'Delete my photos, history, and account'}
         variant="ghost"
+        icon="trash-outline"
         disabled={busy}
         onPress={() => void wipe()}
       />

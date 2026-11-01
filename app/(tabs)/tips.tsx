@@ -2,6 +2,7 @@ import { useFocusEffect } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Text, View } from 'react-native'
 
+import { IconChip } from '@/src/components/app-icon'
 import { Screen } from '@/src/components/screen'
 import { fetchTips } from '@/src/lib/data'
 import { ui } from '@/src/theme/ui'
@@ -32,7 +33,10 @@ const TipsScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>Care</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <IconChip name="bulb" tone="sky" />
+        <Text style={ui.brand}>Care</Text>
+      </View>
       <Text style={ui.title}>Youth habits</Text>
       <Text style={ui.subtitle}>
         Habits that support a rested look. Sleep, sunscreen, and not smoking matter more than most
@@ -41,8 +45,11 @@ const TipsScreen = () => {
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {tips.map((tip) => (
         <View key={tip.id} style={ui.card}>
-          <Text style={ui.muted}>{tip.category}</Text>
-          <Text style={ui.body}>{tip.title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <IconChip name="leaf-outline" tone="mauve" />
+            <Text style={ui.muted}>{tip.category}</Text>
+          </View>
+          <Text style={[ui.body, { fontWeight: '700' }]}>{tip.title}</Text>
           <Text style={ui.muted}>{tip.body}</Text>
         </View>
       ))}

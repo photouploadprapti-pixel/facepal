@@ -84,6 +84,7 @@ const ReviewScreen = () => {
       {analysis ? (
         <AppButton
           label={busy ? 'Saving…' : 'Save this read'}
+          icon="checkmark-circle"
           disabled={busy}
           onPress={() => void save()}
         />
@@ -91,6 +92,7 @@ const ReviewScreen = () => {
       <AppButton
         label={analysis && !analysis.photoQuality.ok ? 'Retake photo' : 'Discard'}
         variant="ghost"
+        icon={analysis && !analysis.photoQuality.ok ? 'camera-reverse' : 'close-circle-outline'}
         onPress={() => {
           takePendingScan()
           router.replace('/scan')

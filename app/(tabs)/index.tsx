@@ -3,7 +3,8 @@ import { useCallback, useState } from 'react'
 import { Text, View } from 'react-native'
 
 import { AnalysisCard } from '@/src/components/analysis-card'
-import { AppButton } from '@/src/components/app-button'
+import { AppButton, BrandMark } from '@/src/components/app-button'
+import { AppIcon, IconChip } from '@/src/components/app-icon'
 import { Screen } from '@/src/components/screen'
 import { TrendSpark } from '@/src/components/trend-spark'
 import { fetchCheckins } from '@/src/lib/data'
@@ -55,22 +56,30 @@ const HomeScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>FacePal</Text>
-      <Text style={ui.title}>Hello, {name}</Text>
+      <View style={styles.header}>
+        <BrandMark size={42} />
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={ui.brand}>FacePal</Text>
+          <Text style={ui.title}>Hello, {name}</Text>
+        </View>
+      </View>
       <Text style={ui.subtitle}>
         A calm daily check for skin quality, spots, and habits — not a medical diagnosis.
       </Text>
 
       <View style={styles.row}>
         <View style={[styles.stat, { backgroundColor: colors.plumSoft }]}>
+          <IconChip name="flame" tone="mauve" />
           <Text style={styles.statValue}>{streak}</Text>
           <Text style={styles.statLabel}>day streak</Text>
         </View>
         <View style={[styles.stat, { backgroundColor: colors.sky }]}>
+          <IconChip name="sparkles" tone="sky" />
           <Text style={styles.statValue}>{latest ? latest.quality : '—'}</Text>
           <Text style={styles.statLabel}>skin quality</Text>
         </View>
         <View style={[styles.stat, { backgroundColor: colors.lilac }]}>
+          <IconChip name="time" tone="mauve" />
           <Text style={styles.statValue}>
             {latestRead ? `+${latestRead.appearanceLoad}` : '—'}
           </Text>
@@ -89,7 +98,10 @@ const HomeScreen = () => {
         />
       ) : (
         <View style={[ui.card, { backgroundColor: colors.plumSoft }]}>
-          <Text style={ui.kicker}>Start your first read</Text>
+          <View style={styles.inline}>
+            <AppIcon name="camera" size={18} color={colors.ink} />
+            <Text style={ui.kicker}>Start your first read</Text>
+          </View>
           <Text style={ui.body}>
             Capture a selfie in even light. FacePal checks spots, flush, under-eyes, texture,
             photo quality, and gives tips for that picture.
@@ -97,35 +109,59 @@ const HomeScreen = () => {
         </View>
       )}
 
-      <AppButton label="Take today’s selfie" onPress={() => router.push('/scan')} />
-      <AppButton label="History" variant="ghost" onPress={() => router.push('/history')} />
+      <AppButton
+        label="Take today’s selfie"
+        icon="camera"
+        onPress={() => router.push('/scan')}
+      />
+      <AppButton
+        label="History"
+        variant="ghost"
+        icon="time-outline"
+        onPress={() => router.push('/history')}
+      />
       {checkins.length > 1 ? (
-        <AppButton label="Compare photos" variant="ghost" onPress={() => router.push('/compare')} />
+        <AppButton
+          label="Compare photos"
+          variant="ghost"
+          icon="git-compare-outline"
+          onPress={() => router.push('/compare')}
+        />
       ) : null}
     </Screen>
   )
 }
 
 const styles = {
+  header: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 12,
+  },
+  inline: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 8,
+  },
   row: {
     flexDirection: 'row' as const,
     gap: 10,
   },
   stat: {
     flex: 1,
-    borderRadius: 20,
-    padding: 14,
-    gap: 2,
+    borderRadius: 22,
+    padding: 12,
+    gap: 6,
     borderWidth: 1,
     borderColor: colors.line,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800' as const,
     color: colors.ink,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700' as const,
     color: colors.muted,
   },

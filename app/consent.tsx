@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Text, View } from 'react-native'
 
 import { AppButton } from '@/src/components/app-button'
+import { IconChip } from '@/src/components/app-icon'
 import { Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { colors, ui } from '@/src/theme/ui'
@@ -28,7 +29,10 @@ const ConsentScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>Privacy first</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <IconChip name="shield-checkmark" tone="navy" />
+        <Text style={ui.brand}>Privacy first</Text>
+      </View>
       <Text style={ui.title}>Before you start</Text>
       <View style={[ui.card, { backgroundColor: colors.plumSoft }]}>
         <Text style={ui.body}>
@@ -50,6 +54,7 @@ const ConsentScreen = () => {
       {error ? <Text style={ui.error}>{error}</Text> : null}
       <AppButton
         label={busy ? 'Saving…' : 'I agree, store my selfies'}
+        icon="shield-checkmark"
         disabled={busy}
         onPress={() => void agree()}
       />

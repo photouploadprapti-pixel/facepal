@@ -1,10 +1,11 @@
 import { useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { Pressable, Text } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 
+import { AppIcon, IconChip } from '@/src/components/app-icon'
 import { Screen } from '@/src/components/screen'
 import { fetchRoutines } from '@/src/lib/data'
-import { ui } from '@/src/theme/ui'
+import { colors, ui } from '@/src/theme/ui'
 import type { YogaRoutine } from '@/src/types/models'
 
 /**
@@ -33,7 +34,10 @@ const YogaListScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>Practice</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <IconChip name="body" tone="mauve" />
+        <Text style={ui.brand}>Practice</Text>
+      </View>
       <Text style={ui.title}>Face yoga</Text>
       <Text style={ui.subtitle}>
         Short guided sessions for the jaw, eyes, forehead, and cheeks. Follow the animation,
@@ -46,7 +50,10 @@ const YogaListScreen = () => {
           style={ui.card}
           onPress={() => router.push(`/yoga/${routine.slug}`)}
         >
-          <Text style={ui.body}>{routine.title}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+            <Text style={[ui.body, { fontWeight: '700', flex: 1 }]}>{routine.title}</Text>
+            <AppIcon name="chevron-forward" size={18} color={colors.plum} />
+          </View>
           <Text style={ui.muted}>
             {routine.zone} · {routine.minutes} min · {routine.level}
           </Text>

@@ -1,8 +1,8 @@
 import { Link } from 'expo-router'
 import { useState } from 'react'
-import { Pressable, Text, TextInput } from 'react-native'
+import { Pressable, Text, TextInput, View } from 'react-native'
 
-import { AppButton } from '@/src/components/app-button'
+import { AppButton, BrandMark } from '@/src/components/app-button'
 import { Field, Screen } from '@/src/components/screen'
 import { useAuth } from '@/src/lib/auth'
 import { ui } from '@/src/theme/ui'
@@ -31,11 +31,14 @@ const SignInScreen = () => {
 
   return (
     <Screen>
-      <Text style={ui.brand}>FacePal</Text>
-      <Text style={ui.title}>Look after your face, daily.</Text>
-      <Text style={ui.subtitle}>
-        Professional skin reads, habits, and face yoga — designed for consistent selfies.
-      </Text>
+      <View style={{ gap: 10 }}>
+        <BrandMark size={52} />
+        <Text style={ui.brand}>FacePal</Text>
+        <Text style={ui.title}>Look after your face, daily.</Text>
+        <Text style={ui.subtitle}>
+          Professional skin reads, habits, and face yoga — designed for consistent selfies.
+        </Text>
+      </View>
       <Field label="Email">
         <TextInput
           autoCapitalize="none"
@@ -51,6 +54,7 @@ const SignInScreen = () => {
       {error ? <Text style={ui.error}>{error}</Text> : null}
       <AppButton
         label={busy ? 'Signing in…' : 'Sign in'}
+        icon="log-in-outline"
         disabled={busy}
         onPress={() => void submit()}
       />

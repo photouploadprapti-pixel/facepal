@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 
+import { AppIcon } from '@/src/components/app-icon'
 import { colors, ui } from '@/src/theme/ui'
 
 type TrendPoint = {
@@ -22,7 +23,10 @@ export const TrendSpark = ({ points, title = '7-day quality' }: TrendSparkProps)
   const max = Math.max(...points.map((point) => point.value), 1)
   return (
     <View style={ui.card}>
-      <Text style={ui.kicker}>{title}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <AppIcon name="bar-chart" size={16} color={colors.plum} />
+        <Text style={ui.kicker}>{title}</Text>
+      </View>
       <View style={styles.row}>
         {points.map((point) => (
           <View key={point.label} style={styles.col}>

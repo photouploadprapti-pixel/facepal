@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 
+import { AppIcon, IconChip } from '@/src/components/app-icon'
 import { ScoreMeter } from '@/src/components/score-meter'
 import { findingTitle } from '@/src/lib/findings'
 import { faceAgeLine, skinHeadline } from '@/src/lib/skin-read'
@@ -26,7 +27,10 @@ export const AnalysisCard = ({
   <View style={{ gap: 14 }}>
     {!analysis.photoQuality.ok ? (
       <View style={[ui.card, { borderColor: colors.plum, backgroundColor: colors.peach }]}>
-        <Text style={ui.kicker}>Photo quality</Text>
+        <View style={styles.inline}>
+          <AppIcon name="warning" size={18} color={colors.warn} />
+          <Text style={ui.kicker}>Photo quality</Text>
+        </View>
         {analysis.photoQuality.issues.map((issue) => (
           <Text key={issue} style={ui.body}>
             {issue}
@@ -42,7 +46,10 @@ export const AnalysisCard = ({
         <Text style={styles.badgeLabel}>quality</Text>
       </View>
       <View style={{ flex: 1, gap: 6 }}>
-        <Text style={ui.kicker}>Today’s skin read</Text>
+        <View style={styles.inline}>
+          <AppIcon name="sparkles" size={14} color={colors.plum} />
+          <Text style={ui.kicker}>Today’s skin read</Text>
+        </View>
         <Text style={ui.body}>
           {skinHeadline(analysis.quality, analysis.findings, analysis.appearanceLoad)}
         </Text>
@@ -59,14 +66,27 @@ export const AnalysisCard = ({
     </View>
 
     <View style={styles.grid}>
-      <ScoreMeter label="Spots" score={analysis.blemishes} tint={colors.blush} />
-      <ScoreMeter label="Flush" score={analysis.redness} tint={colors.peach} />
-      <ScoreMeter label="Under-eye" score={analysis.underEye} tint={colors.lilac} />
-      <ScoreMeter label="Texture" score={analysis.texture} tint={colors.sky} />
+      <ScoreMeter label="Spots" score={analysis.blemishes} tint={colors.blush} icon="ellipse" />
+      <ScoreMeter label="Flush" score={analysis.redness} tint={colors.peach} icon="water" />
+      <ScoreMeter
+        label="Under-eye"
+        score={analysis.underEye}
+        tint={colors.lilac}
+        icon="moon"
+      />
+      <ScoreMeter
+        label="Texture"
+        score={analysis.texture}
+        tint={colors.sky}
+        icon="grid"
+      />
     </View>
 
     <View style={ui.card}>
-      <Text style={ui.kicker}>What FacePal looked at</Text>
+      <View style={styles.inline}>
+        <IconChip name="eye" tone="sky" />
+        <Text style={ui.kicker}>What FacePal looked at</Text>
+      </View>
       {analysis.regions.map((region) => (
         <View key={region.id} style={styles.regionRow}>
           <View style={styles.regionHead}>
@@ -79,20 +99,29 @@ export const AnalysisCard = ({
     </View>
 
     {analysis.findings.length > 0 ? (
-      <View style={[ui.card, { backgroundColor: colors.blush }]}>
-        <Text style={ui.kicker}>Watch</Text>
+      <View style={[ui.card, { backgroundColor: colors.peach }]}>
+        <View style={styles.inline}>
+          <AppIcon name="alert-circle" size={16} color={colors.ink} />
+          <Text style={ui.kicker}>Watch</Text>
+        </View>
         <Text style={ui.body}>{analysis.findings.map((code) => findingTitle[code]).join(' · ')}</Text>
       </View>
     ) : (
-      <View style={[ui.card, { backgroundColor: colors.mint }]}>
-        <Text style={ui.kicker}>Looking steady</Text>
+      <View style={[ui.card, { backgroundColor: colors.sky }]}>
+        <View style={styles.inline}>
+          <AppIcon name="checkmark-circle" size={16} color={colors.slate} />
+          <Text style={ui.kicker}>Looking steady</Text>
+        </View>
         <Text style={ui.body}>No pimple-like spots or strong flush stood out in this frame.</Text>
       </View>
     )}
 
     {compareLines.length > 0 ? (
       <View style={[ui.card, { backgroundColor: colors.lilac }]}>
-        <Text style={ui.kicker}>Compared with past photos</Text>
+        <View style={styles.inline}>
+          <AppIcon name="trending-up" size={16} color={colors.ink} />
+          <Text style={ui.kicker}>Compared with past photos</Text>
+        </View>
         {compareLines.map((line) => (
           <Text key={line} style={ui.body}>
             {line}
@@ -102,7 +131,10 @@ export const AnalysisCard = ({
     ) : null}
 
     <View style={ui.card}>
-      <Text style={ui.kicker}>Tips for this photo</Text>
+      <View style={styles.inline}>
+        <IconChip name="leaf" tone="mauve" />
+        <Text style={ui.kicker}>Tips for this photo</Text>
+      </View>
       {analysis.tips.map((tip) => (
         <Text key={tip} style={ui.body}>
           • {tip}
@@ -121,11 +153,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    backgroundColor: colors.sky,
+    backgroundColor: 'rgba(255,255,255,0.95)',
   },
   badge: {
-    width: 82,
-    height: 82,
+    width: 84,
+    height: 84,
     borderRadius: 28,
     backgroundColor: colors.ink,
     alignItems: 'center',
@@ -164,5 +196,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: colors.plum,
+  },
+  inline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 })
