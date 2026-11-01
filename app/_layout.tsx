@@ -28,6 +28,7 @@ const RootLayout = (): ReactNode => (
         <Stack.Screen name="review" options={{ title: 'Today’s read' }} />
         <Stack.Screen name="history" options={{ title: 'History' }} />
         <Stack.Screen name="habits" options={{ title: 'Skin habits' }} />
+        <Stack.Screen name="edit-profile" options={{ title: 'Edit profile' }} />
         <Stack.Screen name="compare" options={{ title: 'Compare' }} />
         <Stack.Screen name="yoga/[slug]" options={{ title: 'Face yoga' }} />
       </Stack>
