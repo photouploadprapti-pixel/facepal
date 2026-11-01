@@ -88,6 +88,34 @@ export type Tip = {
   body: string
 }
 
+/** One calendar day of skin-supporting habits. */
+export type HabitDay = {
+  id: string
+  userId: string
+  day: string
+  sleepHours: number | null
+  waterGlasses: number
+  spfWorn: boolean
+  stressLevel: number | null
+  cleansedAm: boolean
+  moisturized: boolean
+  cleansedPm: boolean
+  note: string
+}
+
+/** Fields the habits editor can upsert. */
+export type HabitDayInput = {
+  day: string
+  sleepHours: number | null
+  waterGlasses: number
+  spfWorn: boolean
+  stressLevel: number | null
+  cleansedAm: boolean
+  moisturized: boolean
+  cleansedPm: boolean
+  note: string
+}
+
 /** Numeric result of the on-device photo check. */
 export type AnalysisResult = {
   redness: number

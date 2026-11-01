@@ -1,7 +1,8 @@
-import { useFocusEffect } from 'expo-router'
+import { useFocusEffect, useRouter, type Href } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Text, View } from 'react-native'
 
+import { AppButton } from '@/src/components/app-button'
 import { IconChip } from '@/src/components/app-icon'
 import { Screen } from '@/src/components/screen'
 import { fetchTips } from '@/src/lib/data'
@@ -12,6 +13,7 @@ import type { Tip } from '@/src/types/models'
  * Youth-care tips grouped in the order stored in Supabase.
  */
 const TipsScreen = () => {
+  const router = useRouter()
   const [tips, setTips] = useState<Tip[]>([])
   const [error, setError] = useState('')
 
@@ -42,6 +44,12 @@ const TipsScreen = () => {
         Habits that support a rested look. Sleep, sunscreen, and not smoking matter more than most
         products.
       </Text>
+      <AppButton
+        label="Log today’s skin habits"
+        icon="leaf-outline"
+        variant="ghost"
+        onPress={() => router.push('/habits' as Href)}
+      />
       {error ? <Text style={ui.error}>{error}</Text> : null}
       {tips.map((tip) => (
         <View key={tip.id} style={ui.card}>

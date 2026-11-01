@@ -112,25 +112,36 @@ const ProfileScreen = () => {
         </Text>
       </View>
 
-      <Field label="Birth year (optional, for face-age style estimates)">
-        <TextInput
-          keyboardType="number-pad"
-          style={ui.input}
-          value={birthYear}
-          onChangeText={setBirthYear}
-          placeholder="e.g. 1998"
-          placeholderTextColor="#8B95A1"
+      <View style={ui.card}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <IconChip name="calendar" tone="sky" />
+          <Text style={ui.kicker}>Birth year</Text>
+        </View>
+        <Text style={ui.muted}>
+          Optional four-digit year (for example 1998). Used only for face-age style wellness
+          wording — not a medical age.
+        </Text>
+        <Field label="Year you were born">
+          <TextInput
+            keyboardType="number-pad"
+            style={ui.input}
+            value={birthYear}
+            onChangeText={setBirthYear}
+            placeholder="1998"
+            placeholderTextColor="#8B95A1"
+            maxLength={4}
+          />
+        </Field>
+        <AppButton
+          label="Save birth year"
+          variant="ghost"
+          icon="calendar-outline"
+          onPress={() => void saveBirthYear()}
         />
-      </Field>
-      <AppButton
-        label="Save birth year"
-        variant="ghost"
-        icon="calendar-outline"
-        onPress={() => void saveBirthYear()}
-      />
+      </View>
 
       <Field label="Daily reminder hour (0–23)">
-        <Text style={ui.input}>{hour}</Text>
+        <Text style={ui.input}>{hour}:00</Text>
       </Field>
       <ViewHour hour={hour} onChange={setHour} />
       <AppButton

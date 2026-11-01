@@ -2,6 +2,7 @@ import type {
   AnimationKey,
   Checkin,
   FindingCode,
+  HabitDay,
   Profile,
   Tip,
   YogaRoutine,
@@ -203,4 +204,42 @@ export const parseTip = (value: unknown): Tip | null => {
   const body = readString(row, 'body')
   if (!id || !category || !title || !body) return null
   return { id, category, title, body }
+}
+
+/**
+ * Maps a habit_days row.
+ * @param value Unknown row.
+ */
+export const parseHabitDay = (value: unknown): HabitDay | null => {
+  const row = asRecord(value)
+  if (!row) return null
+  const id = readString(row, 'id')
+  const userId = readString(row, 'user_id')
+  const day = readString(row, 'day')
+  const note = readString(row, 'note')
+  const waterGlasses = readNumber(row, 'water_glasses')
+  if (!id || !userId || !day || note === null || waterGlasses === null) return null
+  const sleepRaw = row.sleep_hours
+  const sleepHours =
+    typeof sleepRaw === 'number' && Number.isFinite(sleepRaw)
+      ? sleepRaw
+      : typeof sleepRaw === 'string' && sleepRaw.trim() !== '' && Number.isFinite(Number(sleepRaw))
+        ? Number(sleepRaw)
+        : null
+  const stressRaw = row.stress_level
+  const stressLevel =
+    typeof stressRaw === 'number' && Number.isInteger(stressRaw) ? stressRaw : null
+  return {
+    id,
+    userId,
+    day,
+    sleepHours,
+    waterGlasses,
+    spfWorn: row.spf_worn === true,
+    stressLevel,
+    cleansedAm: row.cleansed_am === true,
+    moisturized: row.moisturized === true,
+    cleansedPm: row.cleansed_pm === true,
+    note,
+  }
 }

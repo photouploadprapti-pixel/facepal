@@ -1,14 +1,20 @@
-import { useFocusEffect, useRouter } from 'expo-router'
+import { useFocusEffect, useRouter, type Href } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Text, View } from 'react-native'
 
 import { AnalysisCard } from '@/src/components/analysis-card'
 import { AppButton, BrandMark } from '@/src/components/app-button'
 import { AppIcon, IconChip } from '@/src/components/app-icon'
+import { HabitSummary } from '@/src/components/habit-summary'
 import { Screen } from '@/src/components/screen'
 import { TrendSpark } from '@/src/components/trend-spark'
-import { fetchCheckins } from '@/src/lib/data'
+import { fetchCheckins, fetchHabitDay, fetchHabitDays } from '@/src/lib/data'
 import { useAuth } from '@/src/lib/auth'
+import {
+  localDayKey,
+  tonightFocus,
+  weeklyHabitInsights,
+} from '@/src/lib/habits'
 import {
   ageFromBirthYear,
   checkinToAnalysis,
@@ -17,23 +23,32 @@ import {
 } from '@/src/lib/skin-read'
 import { streakFromDates } from '@/src/lib/streak'
 import { colors, ui } from '@/src/theme/ui'
-import type { Checkin } from '@/src/types/models'
+import type { Checkin, HabitDay } from '@/src/types/models'
 
 /**
- * Home shows streak, weekly trend, latest skin read, and daily scan actions.
+ * Home shows streak, habits, weekly notes, latest skin read, and scan actions.
  */
 const HomeScreen = () => {
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const router = useRouter()
   const [checkins, setCheckins] = useState<Checkin[]>([])
+  const [todayHabit, setTodayHabit] = useState<HabitDay | null>(null)
+  const [habitDays, setHabitDays] = useState<HabitDay[]>([])
   const [error, setError] = useState('')
 
   useFocusEffect(
     useCallback(() => {
       let active = true
-      fetchCheckins()
-        .then((rows) => {
-          if (active) setCheckins(rows)
+      Promise.all([
+        fetchCheckins(),
+        user ? fetchHabitDay(localDayKey()) : Promise.resolve(null),
+        user ? fetchHabitDays(14) : Promise.resolve([]),
+      ])
+        .then(([rows, habit, habits]) => {
+          if (!active) return
+          setCheckins(rows)
+          setTodayHabit(habit)
+          setHabitDays(habits)
         })
         .catch((caught: unknown) => {
           if (active) setError(caught instanceof Error ? caught.message : 'Could not load')
@@ -41,7 +56,7 @@ const HomeScreen = () => {
       return () => {
         active = false
       }
-    }, []),
+    }, [user]),
   )
 
   const latest = checkins[0]
@@ -53,6 +68,8 @@ const HomeScreen = () => {
     latestRead && previous ? compareReads(latestRead, previous, streak) : []
   const age = ageFromBirthYear(profile?.birthYear ?? null)
   const trend = weeklyTrend(checkins)
+  const focus = tonightFocus(latestRead?.findings ?? [])
+  const insightLines = weeklyHabitInsights(habitDays, checkins)
 
   return (
     <Screen>
@@ -90,6 +107,14 @@ const HomeScreen = () => {
       {trend.length > 1 ? <TrendSpark points={trend} /> : null}
       {error ? <Text style={ui.error}>{error}</Text> : null}
 
+      <HabitSummary
+        habit={todayHabit}
+        insightLines={insightLines}
+        focusTitle={focus.title}
+        focusBody={focus.body}
+        yogaSlug={focus.yogaSlug}
+      />
+
       {latestRead ? (
         <AnalysisCard
           analysis={latestRead}
@@ -113,6 +138,12 @@ const HomeScreen = () => {
         label="Take today’s selfie"
         icon="camera"
         onPress={() => router.push('/scan')}
+      />
+      <AppButton
+        label="Log skin habits"
+        variant="ghost"
+        icon="leaf-outline"
+        onPress={() => router.push('/habits' as Href)}
       />
       <AppButton
         label="History"

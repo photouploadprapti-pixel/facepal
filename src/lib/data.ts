@@ -1,6 +1,16 @@
-import { parseCheckin, parseRoutine, parseTip } from '@/src/lib/guards'
+import { parseCheckin, parseHabitDay, parseRoutine, parseTip } from '@/src/lib/guards'
 import { supabase } from '@/src/lib/supabase'
-import type { AnalysisResult, Checkin, Tip, YogaRoutine } from '@/src/types/models'
+import type {
+  AnalysisResult,
+  Checkin,
+  HabitDay,
+  HabitDayInput,
+  Tip,
+  YogaRoutine,
+} from '@/src/types/models'
+
+const habitColumns =
+  'id, user_id, day, sleep_hours, water_glasses, spf_worn, stress_level, cleansed_am, moisturized, cleansed_pm, note'
 
 const checkinColumns =
   'id, user_id, captured_at, storage_path, redness, under_eye, texture, uneven_tone, blemishes, quality, findings, summary'
@@ -144,7 +154,73 @@ export const fetchTips = async (): Promise<Tip[]> => {
 }
 
 /**
- * Deletes photos, check-ins, yoga history, and consent for the current user.
+ * Loads recent habit days for the signed-in user, newest first.
+ * @param limit Max rows to return.
+ */
+export const fetchHabitDays = async (limit = 14): Promise<HabitDay[]> => {
+  const { data, error } = await supabase
+    .from('habit_days')
+    .select(habitColumns)
+    .order('day', { ascending: false })
+    .limit(limit)
+  if (error) throw new Error(error.message)
+  return (data ?? [])
+    .map((row) => parseHabitDay(row))
+    .filter((row): row is HabitDay => row !== null)
+}
+
+/**
+ * Loads one habit day by calendar key.
+ * @param day YYYY-MM-DD local day.
+ */
+export const fetchHabitDay = async (day: string): Promise<HabitDay | null> => {
+  const { data, error } = await supabase
+    .from('habit_days')
+    .select(habitColumns)
+    .eq('day', day)
+    .maybeSingle()
+  if (error) throw new Error(error.message)
+  if (!data) return null
+  return parseHabitDay(data)
+}
+
+/**
+ * Creates or updates today's habit log for the signed-in user.
+ * @param userId Auth user id.
+ * @param input Habit fields for one calendar day.
+ */
+export const upsertHabitDay = async (
+  userId: string,
+  input: HabitDayInput,
+): Promise<HabitDay> => {
+  const { data, error } = await supabase
+    .from('habit_days')
+    .upsert(
+      {
+        user_id: userId,
+        day: input.day,
+        sleep_hours: input.sleepHours,
+        water_glasses: input.waterGlasses,
+        spf_worn: input.spfWorn,
+        stress_level: input.stressLevel,
+        cleansed_am: input.cleansedAm,
+        moisturized: input.moisturized,
+        cleansed_pm: input.cleansedPm,
+        note: input.note,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,day' },
+    )
+    .select(habitColumns)
+    .single()
+  if (error) throw new Error(error.message)
+  const parsed = parseHabitDay(data)
+  if (!parsed) throw new Error('Saved habit day could not be read back')
+  return parsed
+}
+
+/**
+ * Deletes photos, check-ins, yoga history, habits, and consent for the current user.
  */
 export const deleteMyData = async (): Promise<void> => {
   const { error } = await supabase.rpc('delete_my_facepal_data')
