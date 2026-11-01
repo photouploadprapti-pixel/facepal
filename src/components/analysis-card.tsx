@@ -25,7 +25,7 @@ export const AnalysisCard = ({
 }: AnalysisCardProps) => (
   <View style={{ gap: 14 }}>
     {!analysis.photoQuality.ok ? (
-      <View style={[ui.card, { borderColor: '#F5D0A9', backgroundColor: colors.peach }]}>
+      <View style={[ui.card, { borderColor: colors.plum, backgroundColor: colors.peach }]}>
         <Text style={ui.kicker}>Photo quality</Text>
         {analysis.photoQuality.issues.map((issue) => (
           <Text key={issue} style={ui.body}>
@@ -126,18 +126,20 @@ const styles = StyleSheet.create({
   badge: {
     width: 82,
     height: 82,
-    borderRadius: 20,
-    backgroundColor: colors.hero,
+    borderRadius: 28,
+    backgroundColor: colors.ink,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.plum,
   },
   badgeScore: {
     color: '#FFFFFF',
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   badgeLabel: {
-    color: '#C7D2D8',
+    color: colors.plumSoft,
     fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',

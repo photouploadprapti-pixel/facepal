@@ -17,7 +17,7 @@ const TabDot = ({ focused }: TabDotProps) => (
       width: focused ? 18 : 6,
       height: 6,
       borderRadius: 3,
-      backgroundColor: focused ? '#5EEAD4' : colors.tabMuted,
+      backgroundColor: focused ? colors.plum : colors.tabMuted,
       marginBottom: 4,
     }}
   />

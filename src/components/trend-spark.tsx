@@ -32,7 +32,7 @@ export const TrendSpark = ({ points, title = '7-day quality' }: TrendSparkProps)
                   styles.bar,
                   {
                     height: `${Math.max((point.value / max) * 100, 8)}%`,
-                    backgroundColor: point.value >= 70 ? colors.plum : colors.warn,
+                    backgroundColor: point.value >= 70 ? colors.plum : colors.slate,
                   },
                 ]}
               />

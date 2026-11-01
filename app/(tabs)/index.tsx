@@ -62,7 +62,7 @@ const HomeScreen = () => {
       </Text>
 
       <View style={styles.row}>
-        <View style={[styles.stat, { backgroundColor: colors.mint }]}>
+        <View style={[styles.stat, { backgroundColor: colors.plumSoft }]}>
           <Text style={styles.statValue}>{streak}</Text>
           <Text style={styles.statLabel}>day streak</Text>
         </View>
@@ -88,7 +88,7 @@ const HomeScreen = () => {
           chronologicalAge={age}
         />
       ) : (
-        <View style={[ui.card, { backgroundColor: colors.sky }]}>
+        <View style={[ui.card, { backgroundColor: colors.plumSoft }]}>
           <Text style={ui.kicker}>Start your first read</Text>
           <Text style={ui.body}>
             Capture a selfie in even light. FacePal checks spots, flush, under-eyes, texture,
@@ -113,7 +113,7 @@ const styles = {
   },
   stat: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 14,
     gap: 2,
     borderWidth: 1,
@@ -121,12 +121,12 @@ const styles = {
   },
   statValue: {
     fontSize: 24,
-    fontWeight: '700' as const,
+    fontWeight: '800' as const,
     color: colors.ink,
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     color: colors.muted,
   },
 }

@@ -24,7 +24,7 @@ export const ScoreMeter = ({ label, score, tint }: ScoreMeterProps) => (
           styles.fill,
           {
             width: `${score}%`,
-            backgroundColor: score >= 58 ? colors.warn : colors.plum,
+            backgroundColor: score >= 58 ? colors.warn : colors.skyBlue,
           },
         ]}
       />

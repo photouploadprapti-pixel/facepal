@@ -35,8 +35,8 @@ export const CompareSlider = ({ beforeUri, afterUri }: CompareSliderProps) => {
         value={split}
         onValueChange={setSplit}
         minimumTrackTintColor={colors.plum}
-        maximumTrackTintColor={colors.blush}
-        thumbTintColor={colors.plum}
+        maximumTrackTintColor={colors.skyBlue}
+        thumbTintColor={colors.ink}
       />
     </View>
   )

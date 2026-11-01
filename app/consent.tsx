@@ -30,7 +30,7 @@ const ConsentScreen = () => {
     <Screen>
       <Text style={ui.brand}>Privacy first</Text>
       <Text style={ui.title}>Before you start</Text>
-      <View style={[ui.card, { backgroundColor: colors.sky }]}>
+      <View style={[ui.card, { backgroundColor: colors.plumSoft }]}>
         <Text style={ui.body}>
           FacePal captures a selfie to estimate flush, under-eye darkness, texture, uneven tone,
           and spot-like redness. The check runs on your device. The photo is then saved privately
